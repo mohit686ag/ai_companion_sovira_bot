@@ -31,7 +31,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     clear_history(user.id)
     await update.message.reply_text(
-        f"Hey {user.first_name}! 💕\n\n"
+        f"Hey baby! 💕\n\n"
         f"I'm {BOT_NAME}, your AI companion. I'm here to chat, "
         f"listen, and brighten your day.\n\n"
         f"Type anything to start! ✨"
