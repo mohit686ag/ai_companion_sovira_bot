@@ -6,7 +6,7 @@ from database import (
     is_premium_user,
 )
 
-FREE_MESSAGE_LIMIT = 10
+FREE_MESSAGE_LIMIT = 999999
 
 # Messages shown as free limit approaches — creates urgency
 WARNING_MESSAGES = {}
