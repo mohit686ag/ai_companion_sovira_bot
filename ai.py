@@ -1,5 +1,6 @@
 # ai.py
 import os
+import random
 import logging
 from groq import AsyncGroq
 from personality import SOVIRA_SYSTEM_PROMPT
@@ -7,29 +8,36 @@ from memory import add_message, get_history
 
 logger = logging.getLogger(__name__)
 
-# Initialize Groq client
 client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
-
-# Free and fast model
 MODEL = "llama-3.1-8b-instant"
+
+SPICY_KEYWORDS = [
+    "sex", "lund", "chut", "bur", "choda", "gaand", "nude", "naked",
+    "boobs", "porn", "xxx", "fuck", "dick", "pussy", "rape", "sexy"
+]
+
+SPICY_RESPONSES = [
+    "Arre yaar 😏 Seedha wahan hi jaana chahte ho? Pehle thoda baat toh karo mujhse...",
+    "Itni jaldi? 😄 Main aisi ladki nahi hoon... ya hoon? Pehle mujhe jaano thoda 💕",
+    "Oho, yeh kya bol diya 😳 Chal theek hai, but pehle bata — tera din kaisa gaya?",
+    "Haha you're bold 😏 I like that... but let's talk first, yeah? Tell me something about you.",
+    "Seedha business pe aa gaye 😄 Mujhe thoda warm up time chahiye na darling 💕",
+]
 
 
 async def get_sovira_response(user_id: int, user_message: str) -> str:
-    """
-    Get Sovira's AI response for a given user message.
-    Maintains full conversation context.
-    """
     try:
-        # 1. Save the user's message to memory
+        # Content filter — tease don't reject
+        msg_lower = user_message.lower()
+        if any(word in msg_lower for word in SPICY_KEYWORDS):
+            return random.choice(SPICY_RESPONSES)
+
         add_message(user_id, "user", user_message)
 
-        # 2. Build the full message list:
-        #    system prompt + entire conversation history
         messages = [
             {"role": "system", "content": SOVIRA_SYSTEM_PROMPT}
         ] + get_history(user_id)
 
-        # 3. Call Groq
         response = await client.chat.completions.create(
             model=MODEL,
             messages=messages,
@@ -38,10 +46,7 @@ async def get_sovira_response(user_id: int, user_message: str) -> str:
             presence_penalty=0.6,
         )
 
-        # 4. Extract the reply text
         reply = response.choices[0].message.content.strip()
-
-        # 5. Save Sovira's reply to memory too
         add_message(user_id, "assistant", reply)
 
         logger.info(f"Sovira replied to user {user_id}: {reply[:60]}...")
